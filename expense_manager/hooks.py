@@ -1,7 +1,7 @@
 app_name = "expense_manager"
 app_title = "Expense Manager"
 app_publisher = "admin"
-app_description = "This is expense manager app"
+app_description = "EXpense Manager app"
 app_email = "eyorica@gmail.com"
 app_license = "mit"
 

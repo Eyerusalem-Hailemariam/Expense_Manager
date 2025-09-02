@@ -1,6 +1,6 @@
 ### Expense Manager
 
-This is expense manager app
+EXpense Manager app
 
 ### Installation
 
