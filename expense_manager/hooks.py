@@ -1,7 +1,7 @@
 app_name = "expense_manager"
 app_title = "Expense Manager"
 app_publisher = "admin"
-app_description = "EXpense Manager app"
+app_description = "This is expense manager app"
 app_email = "eyorica@gmail.com"
 app_license = "mit"
 
@@ -137,34 +137,40 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "Expense": {
+        "before_insert": "expense_manager.api.before_insert_expense",
+        "after_insert": "expense_manager.api.after_insert_expense",
+        "before_save": "expense_manager.api.before_save_expense",
+    }
+}
+
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"expense_manager.tasks.all"
-# 	],
-# 	"daily": [
-# 		"expense_manager.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"expense_manager.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"expense_manager.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"expense_manager.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	# "all": [
+	# 	"expense_manager.tasks.all"
+	# ],
+	"daily": [
+		"expense_manager.api.send_daily_expense_summary"
+	],
+	# "hourly": [
+	# 	"expense_manager.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"expense_manager.tasks.weekly"
+	# ],
+	# "monthly": [
+	# 	"expense_manager.tasks.monthly"
+	# ],
+    "cron": {
+          "*/5 * * * *": [
+           "expense_manager.api.send_daily_expense_summary"
+        ]
+    }
+}
 
 # Testing
 # -------
@@ -175,9 +181,9 @@ app_license = "mit"
 # ------------------------------
 #
 # override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "expense_manager.event.get_events"
+# 	"frappe.desk.doctype.event.event.get_events": "expense_manager.event.get_events",
 # }
-#
+
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
@@ -242,3 +248,5 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+website_route_rules = [{'from_route': '/frontend/<path:app_path>', 'to_route': 'frontend'},]

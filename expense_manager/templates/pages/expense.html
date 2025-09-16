@@ -1,0 +1,117 @@
+
+<!-- Use Jinja API functions when rendering templates, reports, print formats, or emails. -->
+{% set result = frappe.call('expense_manager.api.get_expenses', {'page' : 1, 'limit' : 5}) %}
+
+{% if result.success %}
+    <h3>Expenses</h3>
+    <ul>
+        {% for exp in result.data %}
+        <li>
+            {{ frappe.format_date(exp.expense_date)}} -
+            {{exp.category}}:
+            {{ frappe.format(exp.amount, {'fieldtype': 'Currency'}) }}
+            ({{ exp.payment_method }})
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No expenses found.</p>
+{% endif %}
+<!-- {
+  "success": true,
+  "data": [
+    {
+      "expense_date": "2025-09-01",
+      "category": "Travel",
+      "amount": 1200,
+      "description": "Flight to Addis",
+      "payment_method": "Credit Card"
+    },
+    {
+      "expense_date": "2025-09-02",
+      "category": "Meals",
+      "amount": 250,
+      "description": "Team lunch",
+      "payment_method": "Cash"
+    }
+  ],
+  "page": 1,
+  "limit": 5
+}
+
+<h3>Expenses</h3>
+<ul>
+  <li>
+    September 1, 2025 - Travel: 1,200.00 (Credit Card)
+  </li>
+  <li>
+    September 2, 2025 - Meals: 250.00 (Cash)
+  </li>
+</ul>
+
+ -->
+
+<p>Current User: {{ frappe.get_fullname()}}</p>
+<p>System Timezone: {{ frappe.db.get_single_value('System Settings')}}</p>
+<p>Site URL: {{ frappe.get_url() }}</p>
+
+<h2>Expense Voucher</h2>
+<p><b>Date:</b>{{ frappe.format(doc.expense_date, {'fieldtype' : 'Date'})}}</p>
+<p><b>Category:</b> {{ doc.category }}</p>
+<p><b>Amount:</b> {{ frappe.format(doc.amount, {'fieldtype': 'Currency'}) }}</p>
+<p><b>Payment Method:</b> {{ doc.payment_method }}</p>
+
+
+
+
+<h3>My Expenses</h3>
+{% set expenses = frappe.get_list(
+    'Expense',
+    filters={'owner': frappe.session.user},
+    fields=['expense_date', 'category', 'amount'],
+    order_by='expense_date desc',
+    page_length=5
+) %}
+
+<ul>
+  {% for e in expenses %}
+    <li>{{ frappe.format_date(e.expense_date) }} — {{ e.category }}: {{ frappe.format(e.amount, {'fieldtype': 'Currency'}) }}</li>
+  {% endfor %}
+</ul>
+<!-- 
+Coffee (5 USD) on 2025-09-01
+
+Taxi (20 USD) on 2025-09-03
+
+Output: -->
+
+<!-- <h3>My Expenses</h3>
+<ul>
+  <li>September 3, 2025 — Taxi: $20.00</li>
+  <li>September 1, 2025 — Coffee: $5.00</li>
+</ul> -->
+
+<p>Category for EXP-0001: Coffee</p>
+
+
+{% set category = frappe.db.get_value('Expense', 'EXP-0001', 'category') %}
+<p>Category for EXP-0001: {{ category }}</p>
+
+
+
+🔹 5. frappe.get_meta
+{% set meta = frappe.get_meta('Expense') %}
+<p>Expense has {{ meta.fields | length }} fields.</p>
+
+{% if meta.get_field('category') %}
+  <p>Yes, it has a Category field </p>
+{% endif %}
+
+
+<!-- Suppose Expense DocType has 6 fields (expense_date, category, amount, description, payment_method, owner): -->
+
+<p>Expense has 6 fields.</p>
+<p>Yes, it has a Category field </p>
+
+<p>Logged in user: {{ frappe.session.user }}</p>
+<p>CSRF Token: {{ frappe.session.csrf_token }}</p>
