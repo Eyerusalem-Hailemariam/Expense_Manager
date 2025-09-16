@@ -2,7 +2,8 @@
 import frappe
 from pydantic import BaseModel, validator, ValidationError
 from typing import Optional, List
-import frappe.utils
+
+from datetime import date
 
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "http://localhost:8080"
@@ -35,6 +36,14 @@ def add_expense(**kwargs):
         data = ExpenseInput(**kwargs)
         logger.info(f"add_expense called by {frappe.session.user} with data={kwargs}")
         
+        if data.expense_date > date.today():
+            logger.warning(f"Future date provided: {data.expense_date} by {frappe.session.user}")
+            return {
+                "success" : False,
+                "error" : "validation_error",
+                 "details": f"Expense date {data.expense_date} cannot be in the future."
+            }
+
         doc = frappe.get_doc({
             "doctype": "Expense",
             "expense_date": data.expense_date,
